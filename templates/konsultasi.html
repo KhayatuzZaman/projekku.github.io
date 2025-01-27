@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Safindra - Konsultasi Masalah Kulit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Tambahkan Font Awesome untuk ikon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    /* Sidebar styles */
+    .sidebar-hidden {
+      display: none;
+    }
+
+    .sidebar-visible {
+      width: 16rem;
+      display: flex;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .sidebar-hidden {
+      width: 0;
+      display: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #hamburger-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: rgb(2, 1, 1);
+      margin-bottom: 70px;
+    }
+
+    .sidebar-nav li:first-child {
+      margin-top: 70px;
+    }
+
+    .sidebar-nav li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .sidebar-nav li button {
+      padding: 12px;
+      text-align: left;
+      border: none;
+      background: transparent;
+      color: rgb(255, 255, 255);
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-nav li button:hover {
+      background-color: rgb(255, 255, 255);
+      color: #000000;
+    }
+
+    #sidebar {
+    height: 100vh; /* Tinggi penuh layar */
+    overflow-y: auto; /* Tambahkan scroll vertikal */
+    overflow-x: hidden; /* Sembunyikan scroll horizontal */
+    background-color: #ffffff; /* Ubah warna latar belakang */
+    border-right: 1px solid #aba0a4; /* Tambahkan garis batas di sebelah kanan */
+    transition: transform 0.3s ease-in-out;
+  }
+
+    #sidebar.sidebar-visible {
+      transform: translateX(0);
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+    }
+
+    .icon {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .message-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .message-text {
+      max-width: 75%;
+      word-wrap: break-word;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .user-message .message-text {
+      background-color: #bfc1c1;
+      color: #000;
+    }
+
+    .bot-message .message-text {
+      background-color: #bfc1c1;
+      color: #000;
+    }
+
+    #main-content {
+      border: 2px solid black; /* Menambahkan border hitam */
+      transition: margin-left 0.3s ease-in-out;
+  background-color: #ffffff; /* Ubah menjadi putih */
+    }
+
+    #sidebar .back-link {
+      margin-top: auto;
+    }
+
+    #history-label {
+    text-align: center;
+    display: block;
+    padding: 10px;
+    color: #000000;
+    border-radius: 8px;
+    margin-bottom: 5px; /* Kurangi margin bawah */
+  }
+
+  #history-list {
+    padding: 0; /* Menghapus padding yang ada */
+    color: #ffffff;
+  }
+
+  #history-list li {
+  white-space: nowrap; /* Mencegah teks untuk berpindah baris */
+  text-overflow: ellipsis; /* Menambahkan "..." jika teks terlalu panjang */
+  position: relative; /* Pastikan posisi relatif untuk ikon */
+  background-color: #800080; /* Warna ungu untuk latar belakang */
+  color: white !important; /* Warna teks putih */
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 5px; /* Jarak antar item */
+}
+
+#history-list li:hover {
+  background-color: #ffffff; /* Memberikan efek hover untuk menyoroti item */
+  border: 1px solid black;
+  color: #000000;
+}
+
+#history-list li button:last-child {
+  display: none; /* Sembunyikan tombol ikon secara default */
+  color: #000000;
+}
+
+#history-list li:hover button:last-child {
+  display: inline-block; /* Tampilkan ikon saat hover */
+  position: absolute; /* Tetap dalam posisi di dalam item */
+  right: 10px; /* Penempatan ikon di tepi kanan */
+}
+
+    #close-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#close-btn:hover {
+  background: rgb(202, 192, 192);
+}
+#new-chat {
+    width: 100%; /* Tombol memenuhi lebar sidebar */
+    padding: 12px; /* Menambahkan padding */
+    text-align: center; /* Teks di tengah */
+    border: 1px solid black; /* Menghilangkan border */
+    background-color: purple; /* Warna background */
+    color: rgb(255, 255, 255); /* Warna teks */
+    border-radius: 8px; /* Membuat sudut melengkung */
+    transition: background-color 0.3s ease; /* Animasi saat hover */
+  }
+
+  #new-chat:hover {
+    background-color: rgb(255, 255, 255); /* Warna saat hover */
+    color: #000000; /* Warna teks saat hover */
+    border: 1px solid black;
+  }
+
+  #produk-btn {
+    width: 100%; /* Tombol memenuhi lebar sidebar */
+    padding: 12px; /* Menambahkan padding */
+    text-align: center; /* Teks di tengah */
+    border: 1px solid black; /* Menghilangkan border */
+    background-color: purple; /* Warna background */
+    color: rgb(255, 255, 255); /* Warna teks */
+    border-radius: 8px; /* Membuat sudut melengkung */
+    transition: background-color 0.3s ease; /* Animasi saat hover */
+  }
+
+  #produk-btn:hover {
+    background-color: rgb(255, 255, 255); /* Warna saat hover */
+    color: #000000; /* Warna teks saat hover */
+    border: 1px solid black;
+  }
+
+  #history-list li.selected {
+  border: 2px solid #000000; /* Warna border yang lebih tegas */
+  }
+
+
+  </style>
+</head>
+
+<body class="bg-gray-100 h-full flex">
+  <!-- Hamburger Button -->
+  <button id="hamburger-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i> <!-- Hamburger Icon -->
+  </button>
+
+  <!-- Sidebar -->
+  <aside id="sidebar"
+    class="w-64 bg-pink-500 text-white h-full p-4 border-r-4 border-pink-700 shadow-lg sidebar-visible">
+    <nav class="sidebar-nav">
+      <ul class="space-y-4">
+        <li>
+          <button id="new-chat" class="block p-2 rounded hover:bg-white hover:text-pink-600">New Chat</button>
+        </li>
+        <li>
+          <button id="produk-btn" onclick="showProducts()" class="block p-2 rounded hover:bg-white hover:text-pink-600">
+            Produk
+          </button>
+        </li>
+        <li>
+          <span id="history-label">History</span>
+        </li>
+      </ul>
+      <ul id="history-list" class="space-y-2 mt-4"></ul> <!-- Khusus riwayat -->
+    </nav>
+</aside>
+
+
+  <!-- Main Content -->
+  <main class="flex-grow bg-white p-6 transition-all duration-300">
+    <h1 class="text-2xl font-bold text-center mb-6" style="color: #800080;">
+      Safindra
+    </h1>
+
+    <div id="chat-container" class="mb-4 h-[70%] overflow-y-auto border-2 border-black rounded p-4 bg-white w-full max-w-6xl mx-auto">
+      <div id="messages" class="space-y-2">
+        <div class="text-gray-500 text-center">
+          Mulai konsultasi masalah kulit Anda
+        </div>
+      </div>
+    </div>
+
+    <div class="flex w-full max-w-6xl mx-auto mt-14">
+      <!-- Input teks pengguna -->
+      <input type="text" id="user-input" placeholder="Ketik pertanyaan masalah kulit Anda..."
+        class="flex-grow p-3 border-t-2 border-l-2 border-b-2 border-black rounded-l" />
+      
+      <!-- Tombol untuk unggah gambar
+      <button onclick="triggerImageUpload()"
+        class="bg-whitetext-black p-3 border-t-2 border-l-2 border-b-2 border-black hover:bg-gray-200">
+        <i class="fas fa-paperclip"></i>
+      </button> -->
+
+      <button onclick="sendMessage()"
+        class="bg-white text-black p-3 border-t-2 border-b-2 border-l-2 border-r-2 border-black rounded-r hover:bg-blue-500">
+        <i class="fas fa-paper-plane"></i> <!-- Paper plane icon -->
+      </button>
+    
+      <!-- Input file untuk unggah gambar (disembunyikan)
+      <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload()" />
+    </div> -->
+    
+
+    <button id="close-btn" onclick="goToProfil()" class="absolute top-4 right-4 text-black text-xl">
+      <i class="fas fa-user-circle"></i>
+    </button>
+    
+  </main>
+
+  <script>
+    let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    let isChatting = false;
+
+    function saveChatHistory() {
+      localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    }
+
+//     function triggerImageUpload() {
+//   document.getElementById('image-upload').click();
+// }
+
+// Fungsi untuk menangani unggahan gambar
+// function handleImageUpload() {
+//     const imageInput = document.getElementById('image-upload');
+//     const file = imageInput.files[0];
+
+//     if (file) {
+//         // Tampilkan pratinjau gambar sebelum diproses
+//         const reader = new FileReader();
+//         reader.onload = function (e) {
+//             const imgTag = `<img src="${e.target.result}" alt="Uploaded Image" class="max-w-full h-auto rounded-lg border-2 border-gray-300"/>`;
+//             addMessage(imgTag, 'user'); // Tambahkan sebagai pesan pengguna
+//         };
+//         reader.readAsDataURL(file);
+
+//         // Kirim file ke server menggunakan FormData
+//         const formData = new FormData();
+//         formData.append('image', file);
+
+//         axios
+//             .post('/predict/image', formData, {
+//                 headers: {
+//                     'Content-Type': 'multipart/form-data',
+//                 },
+//             })
+//             .then((response) => {
+//                 // Ambil data dari respons server
+//                 const { image_prediction, text_response } = response.data;
+
+//                 // Tampilkan hasil prediksi gambar
+//                 // const imageMessage = `Gambar terdeteksi sebagai: <strong>${image_prediction.class}</strong> (Kepastian: ${(image_prediction.confidence * 100).toFixed(2)}%)`;
+//                 // addMessage(imageMessage, 'bot');
+
+//                 // Tampilkan hasil respons teks
+//                 const textMessage = `${text_response.response}`;
+//                 addMessage(textMessage, 'bot');
+//             })
+//             .catch((error) => {
+//                 console.error('Error:', error);
+
+//                 if (error.response && error.response.data && error.response.data.error) {
+//                     // Tampilkan pesan error dari server jika ada
+//                     addMessage(`Maaf, terjadi kesalahan: ${error.response.data.error}`, 'bot');
+//                 } else {
+//                     addMessage('Maaf, terjadi kesalahan dalam memproses gambar.', 'bot');
+//                 }
+//             });
+//     }
+// }
+
+function addMessage(message, type) {
+    const chatContainer = document.getElementById('messages');
+    const messageDiv = document.createElement('div');
+    const messageContainer = document.createElement('div');
+
+    const iconDiv = document.createElement('div');
+    const textDiv = document.createElement('div');
+
+    const userClasses = ['message-container', 'flex-row-reverse', 'items-center'];
+    const botClasses = ['message-container', 'flex-row', 'items-center'];
+
+    const icon = document.createElement('img');
+    icon.src = type === 'user' ? 'static/bot.png' : 'static/bot.png';
+    icon.alt = type === 'user' ? 'bot Icon' : 'Bot Icon';
+    icon.classList.add('w-16', 'h-16', 'icon');
+
+    iconDiv.appendChild(icon);
+    textDiv.innerHTML = message;
+    textDiv.classList.add('message-text');
+
+    messageContainer.classList.add(...(type === 'user' ? userClasses : botClasses));
+    messageContainer.appendChild(iconDiv);
+    messageContainer.appendChild(textDiv);
+
+    messageDiv.classList.add(type === 'user' ? 'user-message' : 'bot-message');
+    messageDiv.appendChild(messageContainer);
+    chatContainer.appendChild(messageDiv);
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+
+function sendMessage() {
+    const userInput = document.getElementById('user-input');
+    const message = userInput.value.trim();
+    const chatContainer = document.getElementById('messages');
+
+    // Hapus teks awal jika ada
+    const initialMessage = chatContainer.querySelector('.text-gray-500');
+    if (initialMessage) {
+        initialMessage.remove();
+    }
+
+    if (message) {
+        addMessage(message, 'user');
+
+        userInput.value = '';
+
+        axios
+            .post('/predict/text', { question: message })
+            .then((response) => {
+                const data = response.data;
+                const botResponse = data.response; // Hanya mengambil jawaban bot
+                addMessage(botResponse, 'bot');
+
+                // Perbarui riwayat jika percakapan berasal dari riwayat
+                if (chatContainer.dataset.fromHistory === "true") {
+                    const chatIndex = chatContainer.dataset.chatIndex;
+                    const updatedMessages = [
+                        ...chatHistory[chatIndex].messages,
+                        { text: message, sender: 'user' },
+                        { text: botResponse, sender: 'bot' }
+                    ];
+
+                    // Perbarui percakapan yang ada di chatHistory (termasuk yang paling atas)
+                    chatHistory[chatIndex].messages = updatedMessages; // Perbarui pesan dalam riwayat
+
+                    // Simpan riwayat yang sudah diperbarui
+                    saveChatHistory();
+                    updateHistory(); // Perbarui tampilan riwayat
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                addMessage('Maaf, terjadi kesalahan dalam memproses pertanyaan.', 'bot');
+            });
+    }
+}
+
+
+function updateHistory() {
+    const historyList = document.getElementById('history-list');
+    historyList.innerHTML = ''; // Bersihkan riwayat sebelumnya
+
+    // Iterasi `chatHistory` seperti biasa, yang sudah diubah dengan menambahkan chat terbaru di atas
+    chatHistory.forEach((chat, index) => {
+        let question = chat.questions[0];
+
+        const maxLength = 15; // Maksimum panjang teks yang ditampilkan
+        if (question.length > maxLength) {
+            question = question.substring(0, maxLength) + '...'; // Potong teks
+        }
+
+        // Elemen kontainer untuk setiap item riwayat
+        const historyItem = document.createElement('li');
+        historyItem.classList.add('flex', 'justify-between', 'items-center', 'border', 'py-2', 'hover:bg-gray-100');
+        historyItem.style.borderRadius = '8px';
+
+        // Tombol untuk menampilkan riwayat percakapan
+        const questionButton = document.createElement('button');
+        questionButton.textContent = question;
+        questionButton.classList.add('flex-grow', 'text-left', 'text-black', 'font-normal');
+        questionButton.dataset.index = index;
+
+        // Event listener untuk memuat percakapan
+        questionButton.addEventListener('click', function () {
+            loadChat(chat.messages, index);
+        });
+
+        // Tombol untuk menampilkan konfirmasi sebelum menghapus riwayat percakapan
+        const deleteButton = document.createElement('button');
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteButton.classList.add('text-red-500', 'hover:text-red-700', 'ml-2');
+        deleteButton.dataset.index = index;
+
+        // Event listener untuk menampilkan konfirmasi hapus
+        deleteButton.addEventListener('click', function (event) {
+            const confirmationBox = document.createElement('div');
+            confirmationBox.classList.add('confirmation-box', 'absolute', 'bg-white', 'border', 'rounded', 'shadow-lg', 'p-4');
+            confirmationBox.style.left = `${event.clientX}px`;
+            confirmationBox.style.top = `${event.clientY + 20}px`;
+
+            confirmationBox.innerHTML = `
+                <p class="text-gray-700">Apakah Anda yakin ingin menghapus?</p>
+                <button onclick="deleteHistoryItem(${index})" class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700">Hapus</button>
+                <button onclick="closeConfirmationBox()" class="bg-gray-300 text-black py-1 px-3 rounded hover:bg-gray-500">Batal</button>
+            `;
+
+            document.body.appendChild(confirmationBox);
+        });
+
+        // Tambahkan elemen ke dalam kontainer
+        historyItem.appendChild(questionButton);
+        historyItem.appendChild(deleteButton);
+
+        // Tambahkan item ke dalam daftar riwayat
+        historyList.appendChild(historyItem);
+    });
+}
+
+
+  // Fungsi untuk menutup kotak konfirmasi
+  function closeConfirmationBox() {
+    const confirmationBox = document.querySelector('.confirmation-box');
+    if (confirmationBox) {
+      confirmationBox.remove();
+    }
+  }
+
+  function deleteHistoryItem(index) {
+    // Hapus item dari chatHistory menggunakan index yang langsung diberikan
+    chatHistory.splice(index, 1);
+
+    saveChatHistory(); // Simpan perubahan ke localStorage
+    updateHistory();   // Update tampilan riwayat di sidebar
+
+    // Tutup kotak konfirmasi setelah penghapusan
+    closeConfirmationBox();
+    resetChat();
+}
+
+function loadChat(messages, index) {
+    const chatContainer = document.getElementById('messages');
+    chatContainer.innerHTML = ''; // Bersihkan konten chat yang ada
+
+    // Tampilkan pesan-pesan dari chat riwayat
+    messages.forEach((msg) => addMessage(msg.text, msg.sender));
+
+    // Tandai bahwa chat ini berasal dari riwayat
+    chatContainer.dataset.fromHistory = "true";
+    chatContainer.dataset.chatIndex = index; // Simpan index riwayat yang sedang dibuka
+
+    // Sorot item riwayat yang sedang dibuka
+    const historyItems = document.querySelectorAll('#history-list li');
+    historyItems.forEach((item, i) => {
+        if (i === index) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+
+function resetChat() {
+  const chatContainer = document.getElementById('messages');
+  chatContainer.innerHTML = '<div class="text-gray-500 text-center">Mulai konsultasi masalah kulit Anda</div>';
+  chatContainer.dataset.fromHistory = "false";
+
+  // Hapus border yang menandai item riwayat dipilih
+  const historyItems = document.querySelectorAll('#history-list li');
+  historyItems.forEach((item) => item.classList.remove('selected'));
+}
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('main-content');
+      const isVisible = sidebar.classList.contains('sidebar-visible');
+
+      if (isVisible) {
+        sidebar.classList.remove('sidebar-visible');
+        sidebar.classList.add('sidebar-hidden');
+        mainContent.style.marginLeft = '0';
+      } else {
+        sidebar.classList.remove('sidebar-hidden');
+        sidebar.classList.add('sidebar-visible');
+        mainContent.style.marginLeft = '16rem';
+      }
+    }
+    document.getElementById('new-chat').addEventListener('click', function () {
+    const chatContainer = document.getElementById('messages');
+    const chatMessages = Array.from(chatContainer.querySelectorAll('.message-text'));
+
+    // Simpan percakapan ke dalam riwayat jika belum ada
+    if (chatMessages.length > 0 && chatContainer.dataset.fromHistory !== "true") {
+        const messages = chatMessages.map((msg) => ({
+            text: msg.innerText,
+            sender: msg.closest('.user-message') ? 'user' : 'bot',
+        }));
+        const questions = messages.filter((msg) => msg.sender === 'user').map((msg) => msg.text);
+
+        // Simpan ke riwayat hanya jika percakapan tidak duplikat
+        const isDuplicate = chatHistory.some(
+            (chat) => JSON.stringify(chat.messages) === JSON.stringify(messages)
+        );
+
+        if (!isDuplicate && questions.length > 0) {
+            // Menambahkan chat baru ke awal array chatHistory
+            chatHistory.unshift({ questions, messages }); // `unshift()` menambahkan item di awal array
+            saveChatHistory(); // Simpan riwayat yang sudah diperbarui ke localStorage
+            updateHistory(); // Perbarui tampilan riwayat di sidebar
+        }
+    }
+
+    // Reset data riwayat yang dimuat dan chat
+    chatContainer.dataset.fromHistory = "false";
+    resetChat();
+});
+
+
+    document.getElementById('user-input').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    window.addEventListener('load', () => {
+    // Ambil riwayat percakapan dari localStorage saat halaman dimuat
+    chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+    updateHistory(); // Perbarui tampilan riwayat
+});
+
+
+    function goToProfil() {
+  window.location.href = '/profil'; // Pastikan '/' mengarah ke halaman index di server Anda
+}
+
+function showProducts() {
+    // Arahkan pengguna ke halaman produk
+    window.location.href = '/produk'; // Ubah '/products' ke URL halaman produk Anda.
+}
+
+
+  </script>
+</body>
+
+</html>

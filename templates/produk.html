@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Safindra - Konsultasi Masalah Kulit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Tambahkan Font Awesome untuk ikon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    .sidebar-hidden {
+      display: none;
+    }
+
+    .sidebar-visible {
+      width: 16rem;
+      display: flex;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #hamburger-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: rgb(2, 1, 1);
+    }
+
+    .sidebar-nav li:first-child {
+      margin-top: 70px;
+    }
+
+    .sidebar-nav li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .sidebar-nav li button {
+      padding: 12px;
+      text-align: left;
+      border: none;
+      background: transparent;
+      color: rgb(0, 0, 0);
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-nav li button:hover {
+      background-color: rgb(255, 255, 255);
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 110vh;
+      width: 16rem;
+      background-color: #ffffff;
+      overflow-y: auto;
+      border-right: 1px solid #aba0a4;
+      transition: transform 0.1s ease-in-out;
+      transform: translateX(-100%);
+    }
+
+    #sidebar.sidebar-visible {
+      transform: translateX(0);
+    }
+
+    .sidebar-nav {
+      flex-grow: 1;
+    }
+
+    .icon {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    #main-content {
+      margin: 0 auto;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #main-content.with-sidebar {
+      margin-left: 16rem;
+    }
+
+    #main-content.with-sidebar h1 {
+  padding-left: 16rem; /* Menyesuaikan dengan lebar sidebar */
+}
+
+    
+    #sidebar .back-link {
+      margin-top: auto;
+    }
+
+    #close-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      padding: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #close-btn:hover {
+      background: rgb(255, 0, 0);
+    }
+
+    #new-chat,
+    #produk-btn {
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid black;
+      background-color: #800080;
+      color: rgb(255, 255, 255);
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+
+    #new-chat:hover,
+    #produk-btn:hover {
+      background-color: rgb(255, 255, 255);
+      color: #000000;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 h-full flex">
+  <!-- Hamburger Button -->
+  <button id="hamburger-btn" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i> <!-- Hamburger Icon -->
+  </button>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" 
+  class="w-64 bg-pink-500 text-black h-full p-4 border-r-4 border-pink-700 shadow-lg sidebar-visible">
+    <nav class="sidebar-nav">
+      <ul class="space-y-4">
+        <li>
+            <button id="new-chat" onclick="goToConsultationPage()" class="block p-2 rounded hover:bg-white hover:text-pink-600">Konsultasi</button>
+        </li>
+        <li>
+          <button id="produk-btn" onclick="showProducts()" class="block p-2 rounded hover:bg-white hover:text-pink-600">
+            Produk
+          </button>
+        </li>
+      </ul>
+    </nav>
+</aside>
+   <!-- Main Content -->
+   <main class="flex-grow bg-white p-6 transition-all duration-300">
+    <h1 class="text-2xl font-bold text-center mb-6" style="color: #800080;">
+      Safindra
+    </h1>
+
+    <main id="main-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-20 w-90 max-w-6xl with-sidebar">
+      <!-- Contoh Produk -->
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\cera.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Cera Solution</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\Cleansing.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Cleansing for Acne</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\cream.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Cream Acne</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\day.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Day Cream Glowing</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\Krim malam.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Krim Malam Glowing</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\moisturizer.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Moisturizer</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\sabun nd.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Sabun ND</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\serum.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Serum Glowing</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\Sulphur.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Sulphur Wash</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\toner nd.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Toner ND</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\whitening.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Whitening Cream</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+      <div class="bg-white border rounded-lg shadow-md p-4 mt-6 mb-6 flex flex-col items-center w-[80%] h-[120%] mx-auto overflow-auto">
+        <img src="static\zaitun.jpg" alt="Produk 1" class="w-full h-48 object-cover rounded-lg mb-4" onclick="openImageModal(this.src)" />
+        <h2 class="text-lg font-semibold text-gray-800">Minyak Zaitun</h2>
+        <p class="text-gray-600 text-sm">Deskripsi singkat produk ini.</p>
+      </div>
+  </main>
+  
+
+    <!-- <button id="close-btn" onclick="goToIndex()" class="absolute top-4 right-4 text-black text-xl">
+      <i class="fas fa-sign-out-alt"></i>
+    </button> -->
+<!-- Modal for viewing full-size image -->
+<div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50 hidden">
+    <div class="relative">
+      <button id="close-modal-btn" aria-label="Close modal" class="absolute top-0 right-0 bg-white text-black p-2 rounded-full m-2" onclick="closeImageModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      
+        <img id="modal-image" src="" alt="Full-size image" class="max-w-full max-h-screen object-contain rounded-lg">
+    </div>
+</div>
+
+
+  <script>
+      // Fungsi untuk membuka modal dan menampilkan gambar
+  function openImageModal(src) {
+    const modal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    modalImage.src = src; // Setel sumber gambar ke modal
+    modal.classList.remove('hidden'); // Tampilkan modal
+  }
+
+  // Fungsi untuk menutup modal
+  function closeImageModal() {
+    const modal = document.getElementById('image-modal');
+    modal.classList.add('hidden'); // Sembunyikan modal
+  }
+    function goToIndex() {
+  window.location.href = '/'; // Pastikan '/' mengarah ke halaman index di server Anda
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('main-content');
+  const isVisible = sidebar.classList.contains('sidebar-visible');
+
+  if (isVisible) {
+    sidebar.classList.remove('sidebar-visible');
+    mainContent.classList.remove('with-sidebar');
+  } else {
+    sidebar.classList.add('sidebar-visible');
+    mainContent.classList.add('with-sidebar');
+  }
+}
+
+
+// Function to navigate to the consultation page
+function goToConsultationPage() {
+  window.location.href = '/konsultasi';  // Redirect to the consultation page
+}
+
+  </script>
+</body>
+
+</html>

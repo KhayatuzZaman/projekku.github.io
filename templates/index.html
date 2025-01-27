@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Safindra Skin Clinic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Button glowing effect */
+      .glow-button:hover {
+        animation: glow 1.5s ease infinite;
+      }
+
+      @keyframes glow {
+        0% {
+          box-shadow: 0 0 5px #800080, 0 0 10px #800080;
+        }
+        50% {
+          box-shadow: 0 0 15px #800080, 0 0 30px #800080;
+        }
+        100% {
+          box-shadow: 0 0 5px #800080, 0 0 10px #800080;
+        }
+      }
+
+      /* Animated curved arrow */
+      .animated-arrow {
+        width: 300px;
+        height: 200px;
+      }
+
+      .arrow-path {
+        fill: none;
+        stroke: black;
+        stroke-width: 2;
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: draw-arrow 3s ease-in-out infinite;
+      }
+
+      @keyframes draw-arrow {
+        0% {
+          stroke-dashoffset: 1000;
+        }
+        100% {
+          stroke-dashoffset: 0;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- Header -->
+    <header class="bg-[#800080] py-4">
+      <div class="container mx-auto text-center">
+        <h1 class="text-white text-2xl font-bold">Safindra</h1>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto flex flex-col lg:flex-row items-center justify-center py-10 space-y-10 lg:space-y-0 lg:space-x-10">
+      <!-- Doctor Profile -->
+      <div class="bg-white shadow-md rounded-lg p-8 max-w-md text-center relative lg:translate-x-[-25px] lg:translate-y-[25px]">
+        <img
+          src="static/profile.png"
+          alt="Dr. Indranila K, SpKK"
+          class="w-48 h-48 mx-auto rounded-full mb-6"
+        />
+        <h2 class="text-xl font-bold text-gray-700">dr. INDRANILA K, SpKK</h2>
+        <p class="text-base text-gray-600 mt-4 text-justify">
+          Dokter spesialis kulit & kelamin yang berpengalaman menangani pasien
+          dengan keluhan jerawat, jamur, luka, dan pemeriksaan kulit & kelamin.
+        </p>
+      </div>
+
+      <svg class="animated-arrow hidden lg:block relative" style="top: 90px;" viewBox="0 0 300 200">
+  <path
+    class="arrow-path"
+    d="M10 10 C30 85, 140 100, 85 55 
+    C10 10, 80 130, 285 191"
+    fill="transparent"
+    stroke="black"
+    stroke-width="3"
+  />
+  <polygon 
+    class="arrow-tip" 
+    points="290,191 280,185 280,195" 
+    fill="black"
+  />
+</svg>
+
+      <!-- Clinic Info and Button -->
+      <div class="text-center">
+        <img
+          src="static/logo.png"
+          alt="Safindra Skin Clinic"
+          class="w-80 mx-auto"
+        />
+        <h3 class="text-2xl font-semibold text-[#800080] mt-6">
+          Klinik Kecantikan Purwokerto
+        </h3>
+        <button
+          onclick="location.href='/login'"
+          class="bg-[#800080] text-white py-4 px-10 text-lg rounded-full shadow-md hover:bg-[#800080] transform hover:scale-105 glow-button mt-6"
+        >
+          KONSULTASI
+        </button>
+      </div>
+    </main>
+  </body>
+</html>
